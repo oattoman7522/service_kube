@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  selector:
+    matchLabels:
+      app: gitlab # has to match .spec.template.metadata.labels
+  serviceName: "gitlab"
+  replicas: 1 # by default is 1
+  minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        app: gitlab # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: gitlab
+        image: gitlab/gitlab-ce:16.11.8-ce.0
+        ports:
+        - containerPort: 80
+          name: gitlab-web
+        - containerPort: 5150
+          name: gitlab-registry
+        volumeMounts:
+        - name: data
+          mountPath: /var/opt/gitlab
+        - name: logs
+          mountPath: /var/log/gitlab
+        - name: config
+          mountPath: /etc/gitlab
+        env:
+          - name: config
+            valueFrom:
+              configMapKeyRef:
+                name: gitlab
+                key: GITLAB_OMNIBUS_CONFIG
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+  - metadata:
+      name: logs
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi
+  - metadata:
+      name: config
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi
+

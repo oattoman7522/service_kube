@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlab
+  namespace: gitlab
+data:
+  GITLAB_OMNIBUS_CONFIG: |
+            external_url 'http://172.168.0.90'
+            gitlab_rails['gitlab_shell_ssh_port'] = 8252
+            gitlab_rails['time_zone'] = 'Asia/Bangkok'
+            registry_external_url 'http://172.168.0.90:5150'
+            gitlab_rails['registry_api_url'] = "http://172.168.0.90:5150"
+            registry['registry_http_addr'] = "localhost:5005"
+            registry_nginx['listen_port'] = 5150
+            registry_nginx['listen_https'] = false
+            registry_nginx['proxy_set_headers'] = {
+                 "X-Forwarded-Proto" => "https",
+                 "X-Forwarded-Ssl" => "on"
+            }
+            gitlab_rails['rack_attack_git_basic_auth'] = {
+                 'enabled' => false
+            }
+            #registry_nginx['ssl_certificate'] = "/etc/gitlab/cert/sp-git.crt"
+            #registry_nginx['ssl_certificate_key'] = "/etc/gitlab/cert/sp-git.key"
+            ### LDAP Settings
+            ###! Docs: https://docs.gitlab.com/omnibus/settings/ldap.html
+            ###! **Be careful not to break the indentation in the ldap_servers block. It is
+            ###!   in yaml format and the spaces must be retained. Using tabs will not work.**
+            gitlab_rails['ldap_enabled'] = true
+            gitlab_rails['prevent_ldap_sign_in'] = false
+            ###! **remember to close this block with 'EOS' below**

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+  namespace: gitlab
+  labels:
+    app: gitlab
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    name: gitlab-web
+  - port: 5150
+    targetPort: 5150
+    name: gitlab-registry
+  selector:
+    app: gitlab
